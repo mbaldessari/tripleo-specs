@@ -12,7 +12,7 @@ https://blueprints.launchpad.net/tripleo/+spec/pacemaker-lightweight-architectur
 
 Create a template that deploys a minimal pacemaker architecture, where
 all the openstack services are started and monitored by systemd with the
-exception of: VIPs/Haproxy, rabbitmq, redis, mongo and galera.
+exception of: VIPs/Haproxy, rabbitmq, redis and galera.
 
 Problem Description
 ===================
@@ -29,7 +29,6 @@ where pacemaker controls the following resources:
 * RabbitMQ
 * Galera
 * Redis
-* Mongo
 * openstack-cinder-volume (as the service is not A/A yet)
 
 Proposed Change
@@ -93,7 +92,7 @@ Other End User Impact
 
 The operators working with a cloud are impacted in the following ways:
 
-* The services (galera, redis, mongo, openstack-cinder-volume, VIPs,
+* The services (galera, redis, openstack-cinder-volume, VIPs,
   haproxy) will be managed as usual via `pcs`. Pacemaker will monitor these
   services
 
@@ -146,8 +145,6 @@ Other contributors:
 
 Work Items
 ----------
-
-* Evaluate if there are other services that can live without pacemaker (mongo)
 
 * Prepare the template that deploys the lightweight architecture.
   Initially, keep it as close as possible to the existing HA template and
