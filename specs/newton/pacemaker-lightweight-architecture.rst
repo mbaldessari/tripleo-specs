@@ -74,7 +74,9 @@ retrying.
 
 The reason for using only pacemaker for the core services and not, for
 example keepalived for the Virtual IPs, is to keep the stack simple and
-not introduce multiple distributed resource managers.
+not introduce multiple distributed resource managers. Also, if we used
+only keepalived, we'd have no way of recovering from a failure beyond
+trying to relocate the VIP.
 
 The reason for keeping haproxy under pacemaker's management is that 
 we can guarantee that a VIP will always run where haproxy is running,
@@ -144,6 +146,8 @@ Other contributors:
 
 Work Items
 ----------
+
+* Evaluate if there are other services that can live without pacemaker (mongo)
 
 * Prepare the template that deploys the lightweight architecture.
   Initially, keep it as close as possible to the existing HA template and
