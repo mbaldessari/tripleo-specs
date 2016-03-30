@@ -44,7 +44,7 @@ In terms of ordering constraints we will go from a graph like this one:
 http://acksyn.org/files/tripleo/wsgi-openstack-core.pdf (mitaka)
 
 to a graph like this one:
-http://acksyn.org/files/tripleo/light-cib.pdf (lighweight-mitaka)
+http://acksyn.org/files/tripleo/light-cib-nomongo.pdf (lighweight-mitaka)
 
 Once this new architecture is in place and we have tested it extensively,
 we can bless it as the new only HA architecture and also work on the upgrade
