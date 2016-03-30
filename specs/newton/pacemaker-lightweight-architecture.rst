@@ -197,9 +197,14 @@ References
 
 This design came mostly out from a meeting in Brno with the following attendees:
 
+* Andrew Beekhof
 * Chris Feist
+* Eoghan Glynn
 * Fabio Di Nitto
+* Graeme Gillies
+* Hugh Brock
 * Javier Peña
+* Jiri Stransky
 * Lars Kellogg-Steadman
 * Mark Mcloughlin
 * Michele Baldessari
