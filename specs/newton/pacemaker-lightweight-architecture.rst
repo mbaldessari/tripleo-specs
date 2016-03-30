@@ -54,10 +54,12 @@ to supplant the existing HA one. Since the impact of pacemaker in the
 lightweight architecture is quite small, it is possible to consider
 dropping the non-ha architecture and using only lightweight for every
 deployment and every CI job. The decision on that will depend a bit
-on how many corner cases are found.
+on how many corner cases/bugs are found.
 
 Another side-benefit is that with this lightweight architecture the
-whole upgrade/update topic, is much easier to manage with TripleO.
+whole upgrade/update topic is much easier to manage with TripleO,
+because there is less coordination needed between pacemaker, the update
+of openstack services, puppet and the update process itself.
 
 Alternatives
 ------------
@@ -68,7 +70,8 @@ Active/Passive services comes from a careful balance between complexity
 of the architecture and its management and being able to recover resources
 in a known broken state. There is a main assumption here about native
 openstack services:
-They *must* be able to start with the broker and the database down and keep
+
+They *must* be able to start when the broker and the database are down and keep
 retrying.
 
 The reason for using only pacemaker for the core services and not, for
@@ -79,7 +82,7 @@ trying to relocate the VIP.
 
 The reason for keeping haproxy under pacemaker's management is that 
 we can guarantee that a VIP will always run where haproxy is running,
-should an haproxy service start failing.
+should an haproxy service fail.
 
 
 Security Impact
@@ -97,7 +100,16 @@ The operators working with a cloud are impacted in the following ways:
   services
 
 * All other services will be managed via `systemctl` and systemd will be
-  configured to automatically restart a failed service.
+  configured to automatically restart a failed service. Note, that this is
+  already done in RDO with (Restart={always,on-failure}) in the service files.
+  It is a noop when pacemaker manages the service as an override file is
+  created by pacemaker:
+
+    https://github.com/ClusterLabs/pacemaker/blob/master/lib/services/systemd.c#L547
+
+  With the lightweight architecture, restarting a native openstack service across
+  all controllers will require restaring it via `systemctl` on each node (as opposed
+  to a single `pcs` command as it is done today)
 
 * All services will be configured to retry indefinitely to connect to
   the database or to the messaging broker. In case of a controller failure,
@@ -150,7 +162,7 @@ Work Items
   Initially, keep it as close as possible to the existing HA template and
   make it simpler in a second iteration (remove unnecesary steps, etc.)
   Template currently lives here and deploys successfully: 
-    
+
     https://github.com/mbaldessari/tripleo-heat-templates/tree/wip-mitaka-lightweight-arch
 
 * Test failure scenarios and recovery scenario, open bugs against services
