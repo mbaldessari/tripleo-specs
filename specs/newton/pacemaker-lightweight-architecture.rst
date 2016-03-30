@@ -58,7 +58,7 @@ deployment and every CI job. The decision on that will depend a bit
 on how many corner cases are found.
 
 Another side-benefit is that with this lightweight architecture the
-whole upgrade/update topic, is much easier to manage.
+whole upgrade/update topic, is much easier to manage with TripleO.
 
 Alternatives
 ------------
@@ -67,14 +67,18 @@ There are many alternative designs for the HA architecture. The decision
 to use pacemaker only for a certain set of "core" services and all the
 Active/Passive services comes from a careful balance between complexity
 of the architecture and its management and being able to recover resources
-in a known broken state.
+in a known broken state. There is a main assumption here about native
+openstack services:
+They *must* be able to start with the broker and the database down and keep
+retrying.
 
 The reason for using only pacemaker for the core services and not, for
 example keepalived for the Virtual IPs, is to keep the stack simple and
 not introduce multiple distributed resource managers.
 
 The reason for keeping haproxy under pacemaker's management is that 
-we can guarantee that a VIP will always run where haproxy is running.
+we can guarantee that a VIP will always run where haproxy is running,
+should an haproxy service start failing.
 
 
 Security Impact
@@ -99,6 +103,10 @@ The operators working with a cloud are impacted in the following ways:
   the failover scenario will be the same as with the current HA architecture,
   with the difference that the services will just retry to re-connect indefinitely.
 
+* Previously with the HA template every service would be monitored and managed by
+  pacemaker. With the split between openstack services being managed by systemd and
+  "core" services managed by pacemaker, the operator needs to know which service
+  to monitor with which command.
 
 Performance Impact
 ------------------
@@ -114,7 +122,6 @@ that have not already been mentioned, such as:
 * Until we switch the HA architecture to be lightweight we need to maintain
   a lightweight job in CI
 
-
 Developer Impact
 ----------------
 
@@ -128,67 +135,60 @@ Implementation
 Assignee(s)
 -----------
 
-Who is leading the writing of the code? Or is this a blueprint where you're
-throwing it out there to see who picks it up?
-
-If more than one person is working on the implementation, please designate the
-primary author and contact.
-
 Primary assignee:
   michele
+
+Other contributors:
+  ...
+
 
 Work Items
 ----------
 
-Work items or tasks -- break the feature up into the things that need to be
-done to implement it. Those parts might end up being done by different people,
-but we're mostly trying to understand the timeline for implementation.
+* Prepare the template that deploys the lightweight architecture.
+  Initially, keep it as close as possible to the existing HA template and
+  make it simpler in a second iteration (remove unnecesary steps, etc.)
+  Template currently lives here and deploys successfully: 
+    
+    https://github.com/mbaldessari/tripleo-heat-templates/tree/wip-mitaka-lightweight-arch
+
+* Test failure scenarios and recovery scenario, open bugs against services
+  that misbehave in the face of database and/or broker being down
 
 
 Dependencies
 ============
 
-* Include specific references to specs and/or blueprints in tripleo, or in other
-  projects, that this one either depends on or is related to.
-
-* If this requires functionality of another project that is not currently used
-  by Tripleo (such as the glance v2 API when we previously only required v1),
-  document that fact.
-
-* Does this feature require any new library dependencies or code otherwise not
-  included in OpenStack? Or does it depend on a specific version of library?
-
+None
 
 Testing
 =======
 
-Please discuss how the change will be tested.
+So initial smoke-testing has been completed successfully. Another set of
+tests focusing on the behaviour of openstack services when galera and rabbitmq
+are down is in the process of being run. 
 
-Is this untestable in CI given current limitations (specific hardware /
-software configurations available)? If so, are there mitigation plans (3rd
-party testing, gate enhancements, etc).
+Particular focus will be on failover scenarios and recovery times and making
+sure that there are no regressions compared to the current HA architecture.
 
 
 Documentation Impact
 ====================
 
-What is the impact on the docs? Don't repeat details discussed above, but
-please reference them here.
-
+Currently we do not describe the architectures as deployed by TripleO itself,
+so no changes needed. A short page in the docs describing the arch would be a nice
+thing to have in the future.
 
 References
 ==========
 
-Please add any useful references here. You are not required to have any
-reference. Moreover, this specification should still make sense when your
-references are unavailable. Examples of what you could include are:
+This design came mostly out from a meeting in Brno with the following attendees:
 
-* Links to mailing list or IRC discussions
-
-* Links to notes from a summit session
-
-* Links to relevant research, if appropriate
-
-* Related specifications as appropriate (e.g.  if it's an EC2 thing, link the EC2 docs)
-
-* Anything else you feel it is worthwhile to refer to
+* Chris Feist
+* Fabio Di Nitto
+* Javier Peña
+* Lars Kellogg-Steadman
+* Mark Mcloughlin
+* Michele Baldessari
+* Raoul Scarazzini
+* Rob Young
