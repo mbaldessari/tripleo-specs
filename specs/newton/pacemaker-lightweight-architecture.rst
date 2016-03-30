@@ -17,13 +17,14 @@ exception of: VIPs/Haproxy, rabbitmq, redis and galera.
 Problem Description
 ===================
 
-The pacemaker architeture deployed currently via the pacemaker templates
-manages every single service on the controllers via pacemaker. This approach,
-while having the advantage of having a single entity managing and monitoring
-all services, does bring a certain complexity to it and assumes that the
-operaters are quite familiar with pacemaker and the management of resources
-with it. The aim is to create a new template that deploys controllers
-where pacemaker controls the following resources:
+The pacemaker architeture deployed currently via the template
+`puppet/manifests/overcloud_controller_pacemaker.pp` manages every single
+service on the controllers via pacemaker. This approach, while having the
+advantage of having a single entity managing and monitoring all services, does
+bring a certain complexity to it and assumes that the operaters are quite
+familiar with pacemaker and the management of resources with it. The aim is to
+create a new template that deploys controllers where pacemaker controls the
+following resources:
 
 * Virtual IPs + HAProxy
 * RabbitMQ
@@ -129,9 +130,6 @@ No changes compared to the existing architecture.
 Other Deployer Impact
 ---------------------
 
-Discuss things that will affect how you deploy and configure OpenStack
-that have not already been mentioned, such as:
-
 * Until we switch the HA architecture to be lightweight we need to maintain
   a lightweight job in CI
 
@@ -165,8 +163,12 @@ Work Items
 
     https://github.com/mbaldessari/tripleo-heat-templates/tree/wip-mitaka-lightweight-arch
 
+  In a second step, once some more testing has been done, rename it to a separate file,
+  allowing an operator to choose between the lightweight architecture and the existing
+  HA one.
+
 * Test failure scenarios and recovery scenario, open bugs against services
-  that misbehave in the face of database and/or broker being down
+  that misbehave in the face of database and/or broker being down.
 
 
 Dependencies
@@ -177,9 +179,9 @@ None
 Testing
 =======
 
-So initial smoke-testing has been completed successfully. Another set of
-tests focusing on the behaviour of openstack services when galera and rabbitmq
-are down is in the process of being run. 
+Initial smoke-testing has been completed successfully. Another set of tests
+focusing on the behaviour of openstack services when galera and rabbitmq are
+down is in the process of being run.
 
 Particular focus will be on failover scenarios and recovery times and making
 sure that there are no regressions compared to the current HA architecture.
@@ -189,8 +191,8 @@ Documentation Impact
 ====================
 
 Currently we do not describe the architectures as deployed by TripleO itself,
-so no changes needed. A short page in the docs describing the arch would be a nice
-thing to have in the future.
+so no changes needed. A short page in the docs describing the architecture
+would be a nice thing to have in the future.
 
 References
 ==========
